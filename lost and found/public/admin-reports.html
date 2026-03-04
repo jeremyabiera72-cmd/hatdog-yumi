@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Support Inbox | MNHS Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+    :root {
+      --primary: #2563eb; --primary-hover: #1d4ed8; --bg-sidebar: #1e293b;
+      --bg-main: #f1f5f9; --white: #ffffff; --text-main: #0f172a;
+      --text-muted: #64748b; --border: #e2e8f0; --radius: 12px;
+      --shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    
+    body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+
+    /* --- ANIMATIONS --- */
+    @keyframes slideInLeft {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(0); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- SIDEBAR --- */
+    .sidebar { 
+      width: 260px; background-color: var(--bg-sidebar); color: #94a3b8; padding: 2rem 1.5rem; 
+      display: flex; flex-direction: column; flex-shrink: 0; 
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1001;
+      animation: slideInLeft 0.5s ease-out forwards;
+    }
+    .brand { color: white; font-weight: 800; font-size: 1.2rem; margin-bottom: 3rem; display: flex; justify-content: space-between; align-items: center; }
+    .close-sidebar { display: none; background: none; border: none; color: white; font-size: 1.8rem; cursor: pointer; }
+
+    .nav-link { text-decoration: none; color: #94a3b8; padding: 0.8rem 1rem; border-radius: 10px; display: block; margin-bottom: 0.5rem; transition: 0.3s; font-size: 0.95rem; }
+    .nav-link:hover { background: rgba(255, 255, 255, 0.08); color: white; transform: translateX(5px); }
+    .nav-link.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+
+    /* --- MAIN AREA --- */
+    .main { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; width: 100%; }
+    
+    .header-bar { 
+      background: var(--white); height: 64px; display: flex; align-items: center; 
+      justify-content: space-between; padding: 0 1.25rem; border-bottom: 1px solid var(--border); 
+      position: sticky; top: 0; z-index: 100; 
+    }
+
+    .content { padding: 2rem 1.25rem; width: 100%; max-width: 1200px; margin: 0 auto; }
+
+    /* --- TABLE SYSTEM --- */
+    .table-container { 
+      background: white; border-radius: var(--radius); border: 1px solid var(--border); 
+      overflow: hidden; box-shadow: var(--shadow);
+      opacity: 0; animation: fadeInUp 0.6s ease-out forwards 0.3s;
+    }
+    
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th { background: #f8fafc; padding: 1rem; font-size: 0.75rem; color: #64748b; text-transform: uppercase; border-bottom: 1px solid var(--border); letter-spacing: 0.5px; }
+    td { padding: 1rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; vertical-align: middle; transition: background 0.2s; }
+    
+    tr:hover td { background-color: #f8fafc; }
+
+    .badge { padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; display: inline-block; }
+    .badge-new { background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; }
+    .badge-solved { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
+    
+    .actions-cell { display: flex; gap: 8px; }
+    .btn-action { padding: 8px 12px; border-radius: 8px; border: none; cursor: pointer; font-weight: 700; font-size: 0.8rem; transition: 0.2s; }
+    .btn-resolve { background: #eff6ff; color: var(--primary); }
+    .btn-resolve:hover { background: var(--primary); color: white; }
+    .btn-delete { background: #fff1f2; color: #e11d48; }
+    .btn-delete:hover { background: #e11d48; color: white; }
+    .btn-action:active { transform: scale(0.95); }
+
+    #menuBtn { background: #f1f5f9; border: none; font-size: 1.4rem; cursor: pointer; padding: 8px; border-radius: 10px; display: none; }
+
+    /* --- MOBILE REFINEMENT --- */
+    @media (max-width: 850px) {
+      #menuBtn { display: flex; }
+      .sidebar { position: fixed; left: 0; transform: translateX(-100%); height: 100%; animation: none; }
+      .sidebar.show { transform: translateX(0); }
+      .close-sidebar { display: block; }
+
+      thead { display: none; }
+      tr { display: block; padding: 1rem; border-bottom: 8px solid var(--bg-main); position: relative; }
+      td { display: block; border: none; padding: 0.4rem 0; width: 100%; }
+      
+      td:first-child { font-size: 1.1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #f1f5f9; margin-bottom: 0.5rem; }
+      td:nth-child(2):before { content: "Category: "; font-weight: 700; color: var(--text-muted); }
+      td:last-child { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #f1f5f9; }
+      
+      .content { padding: 1rem; }
+    }
+
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); z-index: 1000; }
+    .sidebar-overlay.active { display: block; }
+  </style>
+</head>
+<body>
+
+  <div id="overlay" class="sidebar-overlay"></div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="brand">
+      <span>Admin Panel</span>
+      <button class="close-sidebar" id="closeSidebar">&times;</button>
+    </div>
+    <nav style="display: flex; flex-direction: column; height: 100%;">
+      <a href="admin.html" class="nav-link">📊 Dashboard</a>
+      <a href="admin-reports.html" class="nav-link active">🪲 User Reports</a>
+      
+      <div style="margin-top: auto;">
+        <a href="index.html" class="nav-link" style="color:#f87171; font-weight: 700;">🚪 Logout</a>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <header class="header-bar">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button id="menuBtn">☰</button>
+        <div style="font-size: 0.8rem; font-weight: 800; color: var(--primary); letter-spacing: 0.5px;">SUPPORT INBOX</div>
+      </div>
+    </header>
+
+    <div class="content">
+      <h2 style="margin-bottom: 1.5rem; font-weight: 800; letter-spacing: -0.8px; animation: fadeInUp 0.5s ease-out forwards;">User Tickets</h2>
+      
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Reporter</th>
+              <th>Category</th>
+              <th>Message</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="reportContainer">
+            </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { db } from "../js/firebase.js";
+    import { collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // UI Logic
+    const menuBtn = document.getElementById("menuBtn");
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("overlay");
+    const closeSidebar = document.getElementById("closeSidebar");
+
+    const toggleMenu = () => {
+      sidebar.classList.toggle("show");
+      overlay.classList.toggle("active");
+    };
+
+    menuBtn.onclick = toggleMenu;
+    closeSidebar.onclick = toggleMenu;
+    overlay.onclick = toggleMenu;
+
+    // Real-time Support Logic
+    onSnapshot(query(collection(db, "reports"), orderBy("createdAt", "desc")), (snapshot) => {
+      const container = document.getElementById('reportContainer');
+      container.innerHTML = '';
+      snapshot.forEach((rDoc) => {
+        const data = rDoc.data();
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td><strong>${data.name}</strong></td>
+          <td><span style="color:var(--primary); font-weight:600;">${data.category}</span></td>
+          <td style="color: #64748b; max-width: 300px;">${data.description}</td>
+          <td><span class="badge ${data.status === 'New' ? 'badge-new' : 'badge-solved'}">${data.status}</span></td>
+          <td class="actions-cell">
+            <button class="btn-action btn-resolve" onclick="resolveTicket('${rDoc.id}')">Resolve</button>
+            <button class="btn-action btn-delete" onclick="deleteTicket('${rDoc.id}')">Delete</button>
+          </td>`;
+        container.appendChild(row);
+      });
+    });
+
+    window.resolveTicket = async (id) => {
+        try {
+            await updateDoc(doc(db, "reports", id), { status: "Solved" });
+        } catch (e) { console.error(e); }
+    };
+
+    window.deleteTicket = async (id) => {
+        if(confirm("Delete this report permanently?")) {
+            await deleteDoc(doc(db, "reports", id));
+        }
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Support & Contact - MNHS</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-body: #f1f5f9;
+            --bg-sidebar: #1e293b;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --white: #ffffff;
+            --radius: 16px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- SIDEBAR & DRAWER --- */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            color: #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 1.5rem;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1001;
+            animation: slideInLeft 0.6s ease-out;
+        }
+
+        .sidebar-brand {
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 3rem;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-sidebar { display: none; background: none; border: none; color: white; font-size: 1.8rem; cursor: pointer; }
+
+        .nav-item {
+            text-decoration: none;
+            color: #94a3b8;
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: 0.3s ease;
+        }
+
+        .nav-item:hover { 
+            background: rgba(255, 255, 255, 0.08); 
+            color: var(--white);
+            transform: translateX(5px);
+        }
+        .nav-item.active { background: var(--primary); color: var(--white); }
+
+        /* --- MAIN AREA --- */
+        .main-content { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; width: 100%; }
+
+        .top-bar {
+            background: var(--white);
+            padding: 0 1.5rem;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .content-wrapper { padding: 2.5rem 1.25rem; max-width: 1000px; margin: 0 auto; width: 100%; }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        /* Staggered Card Animation */
+        .card:nth-child(1) { animation-delay: 0.2s; }
+        .card:nth-child(2) { animation-delay: 0.4s; }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .card h2 { font-size: 1.4rem; margin-bottom: 0.5rem; font-weight: 800; }
+        .card p { color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.9rem; line-height: 1.5; }
+
+        /* Form Inputs */
+        .form-group { margin-bottom: 1.25rem; }
+        label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.5rem; color: #475569; }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 0.85rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            background: #f8fafc;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover { background: var(--primary-hover); transform: scale(1.02); }
+        .btn:active { transform: scale(0.97); }
+
+        /* Social Link Buttons */
+        .social-link {
+            display: flex;
+            align-items: center;
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            background: #f8fafc;
+            text-decoration: none;
+            color: var(--text-main);
+            margin-bottom: 0.75rem;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            background: #ffffff;
+            border-color: var(--primary);
+            transform: translateX(10px);
+        }
+
+        .badge {
+            background: #dbeafe;
+            color: var(--primary);
+            padding: 0.3rem 0.8rem;
+            border-radius: 99px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            display: inline-block;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        /* Online Pulse Status */
+        .status-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #10b981;
+            background: #ecfdf5;
+            padding: 6px 14px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 0 rgba(16, 185, 129, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        #menuBtn { background: #f1f5f9; border: none; font-size: 1.4rem; cursor: pointer; padding: 8px; border-radius: 10px; display: none; }
+
+        @media (max-width: 900px) {
+            #menuBtn { display: flex; }
+            .sidebar { position: fixed; left: 0; transform: translateX(-100%); height: 100%; animation: none; }
+            .sidebar.show { transform: translateX(0); }
+            .close-sidebar { display: block; }
+            
+            .grid { grid-template-columns: 1fr; gap: 1.5rem; }
+        }
+
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); z-index: 1000; }
+        .sidebar-overlay.active { display: block; }
+    </style>
+</head>
+<body>
+
+    <div id="overlay" class="sidebar-overlay"></div>
+
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-brand">
+            <span>MNHS Portal</span>
+            <button class="close-sidebar" id="closeSidebar">&times;</button>
+        </div>
+        <nav style="display: flex; flex-direction: column;">
+            <a href="index.html" class="nav-item">Dashboard</a>
+            <a href="contact.html" class="nav-item active">Contact Developer</a>
+            <a href="admin.html" class="nav-item">Admin Login</a>
+            <a href="report-problems.html" class="nav-item">Report Problems</a>
+            <a href="help-us-improve.html" class="nav-item">Help Us Improve</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <button id="menuBtn">☰</button>
+            <div class="status-badge">
+                <div class="pulse-dot"></div> Online
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+            <div class="grid">
+                
+                <div class="card">
+                    <span class="badge">DEVELOPER</span>
+                    <h2>Jeremy Abiera</h2>
+                    <p>System Architect. Reach out via official channels for inquiries.</p>
+                    
+                    <div class="dev-info">
+                        <a href="mailto:jeremyabiera72@gmail.com" class="social-link">
+                            <div>
+                                <div style="font-size: 0.85rem; font-weight: 700;">Email</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">jeremyabiera72@gmail.com</div>
+                            </div>
+                        </a>
+                        <a href="https://facebook.com/JeremyAbiera" class="social-link" target="_blank">
+                            <div>
+                                <div style="font-size: 0.85rem; font-weight: 700;">Facebook</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">Jeremy Abiera</div>
+                            </div>
+                        </a>
+                        <a href="https://instagram.com/yukiwatanabe" class="social-link" target="_blank">
+                            <div>
+                                <div style="font-size: 0.85rem; font-weight: 700;">Instagram</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">@yukiwatanabe</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <span class="badge" style="background: #fee2e2; color: #ef4444;">SUPPORT</span>
+                    <h2>Submit a Ticket</h2>
+                    <p>Found a bug? Describe it below and our team will review it.</p>
+                    
+                    <form id="contactDevForm">
+                        <div class="form-group">
+                            <label>Issue Category</label>
+                            <select id="devIssueCategory">
+                                <option value="Technical Bug">Technical Bug</option>
+                                <option value="UI/UX Improvement">UI/UX Improvement</option>
+                                <option value="Feature Request">Feature Request</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Detailed Description</label>
+                            <textarea id="devIssueDesc" placeholder="What happened?" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="btn" id="devSubmitBtn">Submit Report</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const menuBtn = document.getElementById("menuBtn");
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("overlay");
+        const closeSidebar = document.getElementById("closeSidebar");
+
+        const toggleMenu = () => {
+            sidebar.classList.toggle("show");
+            overlay.classList.toggle("active");
+            document.body.style.overflow = sidebar.classList.contains("show") ? "hidden" : "auto";
+        };
+
+        menuBtn.onclick = toggleMenu;
+        closeSidebar.onclick = toggleMenu;
+        overlay.onclick = toggleMenu;
+    </script>
+    <script type="module" src="../js/submit.js"></script>
+
+</body>
+</html>
